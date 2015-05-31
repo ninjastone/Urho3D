@@ -122,6 +122,7 @@ bool noOverwriteMaterial_ = false;
 bool noOverwriteTexture_ = false;
 bool noOverwriteNewerTexture_ = false;
 bool checkUniqueModel_ = true;
+bool exportAnimationOnly_ = false;
 unsigned maxBones_ = 64;
 Vector<String> nonSkinningBoneIncludes_;
 Vector<String> nonSkinningBoneExcludes_;
@@ -248,6 +249,7 @@ void Run(const Vector<String>& arguments)
             "-ct         Check and do not overwrite if texture exists\n"
             "-ctn        Check and do not overwrite if texture has newer timestamp\n"
             "-am         Export all meshes even if identical (scene mode only)\n"
+            "-a          Export animation only\n"
         );
     }
     
@@ -389,6 +391,8 @@ void Run(const Vector<String>& arguments)
                 noOverwriteNewerTexture_ = true;
             else if (argument == "am")
                 checkUniqueModel_ = false;
+            else if (argument == "a")
+                exportAnimationOnly_ = true;
         }
     }
     
@@ -542,7 +546,12 @@ void ExportModel(const String& outName, bool animationOnly)
     CollectMeshes(model, model.rootNode_);
     CollectBones(model, animationOnly);
     BuildBoneCollisionInfo(model);
-    BuildAndSaveModel(model);
+
+    if (!exportAnimationOnly_)
+    {
+        BuildAndSaveModel(model);
+    }
+
     if (!noAnimations_)
     {
         CollectAnimations(&model);
